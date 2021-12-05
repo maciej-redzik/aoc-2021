@@ -21,32 +21,39 @@ namespace part2
 
             int[,] bits = GetBitArray(lines);
 
-            int[,] oxygenArray = CalcOxygenGeneratorRating(bits, 0);
-            //int[,] co2Array = CalcCo2Gene
+            int[,] oxygenArray = CalcRating(bits, 0, true);
+            int[,] co2Array = CalcRating(bits, 0, false);
 
             Console.WriteLine(bits);
 
             Console.WriteLine("Oxygen generator rating code:");
             string oxygenCode = GetStringCodeFromBits(oxygenArray);
+            string co2Code = GetStringCodeFromBits(co2Array);
 
-            Console.Write($"{oxygenCode} ({Convert.ToInt32(oxygenCode, 2)})");
+            Console.WriteLine($"{oxygenCode} ({Convert.ToInt32(oxygenCode, 2)})");
+            Console.WriteLine($"{co2Code} ({Convert.ToInt32(co2Code, 2)})");
 
-
+            Console.WriteLine($"Life support rating: {(Convert.ToInt32(oxygenCode, 2) * Convert.ToInt32(co2Code, 2))}");
         }
 
-        private static int[,] CalcOxygenGeneratorRating(int[,] bits, int columnNo)
+        private static int[,] CalcRating(int[,] bits, int columnNo, bool isMost)
         {
             int[,] selectedArrays = bits;
 
-            int mostCommonNo = CalcMostCommonNo(bits, columnNo);
-            selectedArrays = SelectArrays(bits, columnNo, mostCommonNo);
+            int commonNo = 0;
+            if (isMost)
+                commonNo = CalcMostCommonNo(bits, columnNo);
+            else
+                commonNo = CalcLeastCommonNo(bits, columnNo);
+
+            selectedArrays = SelectArrays(bits, columnNo, commonNo);
 
             if (selectedArrays.GetLength(0) == 1)
             {
                 return selectedArrays;
             }
             columnNo++;
-            selectedArrays = CalcOxygenGeneratorRating(selectedArrays, columnNo);
+            selectedArrays = CalcRating(selectedArrays, columnNo, isMost);
 
             return selectedArrays;
         }
@@ -68,6 +75,24 @@ namespace part2
             }
             return count1 >= count0 ? 1 : 0;
 
+        }
+
+        private static int CalcLeastCommonNo(int[,] bits, int columnNo)
+        {
+            int count1 = 0;
+            int count0 = 0;
+            for (int i = 0; i < bits.GetLength(0); i++)
+            {
+                if (bits[i, columnNo] == 0)
+                {
+                    count0++;
+                }
+                else
+                {
+                    count1++;
+                }
+            }
+            return count1 < count0 ? 1 : 0;
         }
 
         private static int[,] SelectArrays(int[,] bits, int columnNo, int mostCommonNo)
