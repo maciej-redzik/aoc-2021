@@ -8,7 +8,6 @@ namespace part1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             string output = System.IO.File.ReadAllText("input.txt");
             string [] lines = output.Split(Environment.NewLine, int.MaxValue, StringSplitOptions.RemoveEmptyEntries);
 
